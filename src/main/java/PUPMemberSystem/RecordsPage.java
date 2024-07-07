@@ -8,6 +8,7 @@ import javax.swing.table.*;
 
 public class RecordsPage extends JFrame implements ActionListener {
     
+    private ImageIcon iipup;
     private JLabel lblTitle, lblSearch, lblLName, lblCourse;
     private JTextField txfLName, txfCourse;
     private JTable tblRecords;
@@ -25,6 +26,10 @@ public class RecordsPage extends JFrame implements ActionListener {
         setVisible(true);
         setResizable(false);
         setLocationRelativeTo(null);
+        
+        //frame icon
+        iipup = new ImageIcon("pup logo.png");
+        setIconImage(iipup.getImage());
         
         lblTitle = new JLabel("STUDENT RECORDS", SwingConstants.CENTER);
         add(lblTitle);

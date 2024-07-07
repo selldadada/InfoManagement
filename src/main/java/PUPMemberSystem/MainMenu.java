@@ -8,6 +8,7 @@ import java.awt.Font;
 
 public class MainMenu extends JFrame implements ActionListener {
     
+    private ImageIcon iipup;
     private JLabel lblbg, lblusn, lblpw, lblwelcome, lbllogin, lblloading;
     private JPanel pnlstud, pnlpw;
     private JTextField txfadmin;
@@ -24,6 +25,10 @@ public class MainMenu extends JFrame implements ActionListener {
         setVisible(true);
         setResizable(false);
         setLocationRelativeTo(null);
+        
+        //frame icon
+        iipup = new ImageIcon("pup logo.png");
+        setIconImage(iipup.getImage());
         
         //background image
         lblbg = new JLabel();

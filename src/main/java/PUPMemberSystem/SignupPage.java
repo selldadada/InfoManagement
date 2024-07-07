@@ -6,8 +6,9 @@ import java.awt.Color;
 import java.awt.Font;
 
 public class SignupPage extends JFrame implements ActionListener {
-
-    private JLabel lblbg, lbltitle, lblDescription, lblLName, lblFName, lblMName, lblStudNo, lblCourse, lblYear, lblAddress, lblContactNo, lblBday, lblPosition, lblAffiliation;
+    
+    private ImageIcon iipup;
+    private JLabel lbltitle, lblDescription, lblLName, lblFName, lblMName, lblStudNo, lblCourse, lblYear, lblAddress, lblContactNo, lblBday, lblPosition, lblAffiliation;
     private JPanel pnlYellow;
     private JTextField txfLName, txfFName, txfMName, txfStudNo, txfCourse, txfYear, txfAddress, txfContactNo, txfBday, txfPosition, txfAffiliation;
     private JButton btnSubmit;
@@ -21,6 +22,10 @@ public class SignupPage extends JFrame implements ActionListener {
         getContentPane().setBackground(new java.awt.Color(230, 220, 240));
         setResizable(false);
         setLocationRelativeTo(null);
+        
+        //frame icon
+        iipup = new ImageIcon("pup logo.png");
+        setIconImage(iipup.getImage());
         
         // title text
         lbltitle = new JLabel("CREATE NEW STUDENT RECORD", SwingConstants.CENTER);
