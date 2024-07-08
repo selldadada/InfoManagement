@@ -13,7 +13,7 @@ public class MainMenu extends JFrame implements ActionListener {
     private JPanel pnlstud, pnlpw;
     private JTextField txfadmin;
     private JPasswordField pwfPw;
-    private JButton btnLogin;
+    private JButton btnLogin, btnClear, btnExit;
     private JProgressBar pgbloading;
     private JCheckBox ckbreveal;
     
@@ -87,13 +87,27 @@ public class MainMenu extends JFrame implements ActionListener {
         ckbreveal.setOpaque(false);
         ckbreveal.addActionListener(this);
 
-        //login button
+        //buttons
+        btnClear = new JButton("Clear");
+        lblbg.add(btnClear);
+        btnClear.setBounds(393,420,100,28);
+        btnClear.setBackground(new Color(179, 0, 0));
+        btnClear.setForeground(Color.WHITE);
+        btnClear.addActionListener(this);
+        
         btnLogin = new JButton("Login");
         lblbg.add(btnLogin);
-        btnLogin.setBounds(450,420,100,28);
+        btnLogin.setBounds(503,420,100,28);
         btnLogin.setBackground(new Color(179, 0, 0));
         btnLogin.setForeground(Color.WHITE);
         btnLogin.addActionListener(this);
+        
+        btnExit = new JButton("Exit");
+        lblbg.add(btnExit);
+        btnExit.setBounds(10,525,90,25);
+        btnExit.setBackground(new Color(150, 0, 0));
+        btnExit.setForeground(Color.WHITE);
+        btnExit.addActionListener(this);
         
         //Loading screen
         pgbloading = new JProgressBar(SwingConstants.CENTER);
@@ -121,7 +135,14 @@ public class MainMenu extends JFrame implements ActionListener {
             else {
                 pwfPw.setEchoChar('•');
             }
-        } 
+        }
+        else if (e.getSource() == btnExit) {
+            dispose();
+        }
+        else if (e.getSource() == btnClear) {
+            pwfPw.setText("");
+            txfadmin.setText("");
+        }
         else if (e.getSource() == btnLogin) {
             String usn = txfadmin.getText();
             String pw = new String(pwfPw.getPassword());

@@ -16,7 +16,7 @@ public class RecordsPage extends JFrame implements ActionListener {
     private JScrollPane spScroll;
     private DefaultTableModel ColumnHeaders;
     private JTableHeader tableheader;
-    private JButton btnMenu, btnNewRecord, btnDelRecord, btnUpdRecord, btnEnter;
+    private JButton btnLogout, btnNewRecord, btnDelRecord, btnUpdRecord, btnEnter, btnClear;
 
     RecordsPage() {
         setTitle("VIEWING OF RECORDS");
@@ -107,14 +107,21 @@ public class RecordsPage extends JFrame implements ActionListener {
         btnEnter.setBackground(new Color(119, 7, 55));
         btnEnter.setForeground(Color.WHITE);
         btnEnter.addActionListener(this);
+        
+        btnClear = new JButton("Clear");
+        add(btnClear);
+        btnClear.setBounds(1190,540,100,25);
+        btnClear.setBackground(new Color(119, 7, 55));
+        btnClear.setForeground(Color.WHITE);
+        btnClear.addActionListener(this);
 
         //button to return to main menu
-        btnMenu = new JButton("Main Menu");
-        add(btnMenu);
-        btnMenu.setBounds(30,612,100,28);
-        btnMenu.setBackground(new Color(119, 7, 55));
-        btnMenu.setForeground(Color.WHITE);
-        btnMenu.addActionListener(this);
+        btnLogout = new JButton("Log out");
+        add(btnLogout);
+        btnLogout.setBounds(30,612,100,28);
+        btnLogout.setBackground(new Color(119, 7, 55));
+        btnLogout.setForeground(Color.WHITE);
+        btnLogout.addActionListener(this);
         
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbcite","root","");
@@ -161,14 +168,51 @@ public class RecordsPage extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == btnMenu) {
+        if(e.getSource() == btnLogout) {
             dispose();
             MainMenu mm = new MainMenu();
             mm.setVisible(true);
         }
+        else if(e.getSource() == btnClear) {
+            txfLName.setText("");
+            txfFName.setText("");
+        }
         else if(e.getSource() == btnEnter) {
-            SearchFrame sf = new SearchFrame();
-            sf.setVisible(true);
+            String lastName = txfLName.getText().trim();
+            String firstName = txfFName.getText().trim();
+        
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbcite", "root", "");
+            String query = "SELECT * FROM tblcite WHERE LName=? AND FName=?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, lastName);
+            pstmt.setString(2, firstName);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                SearchFrame sf = new SearchFrame();
+                sf.setVisible(true);
+                
+                sf.LName.setText(rs.getString("LName"));
+                sf.FName.setText(rs.getString("FName"));
+                sf.MName.setText(rs.getString("MName"));
+                sf.StudNo.setText(rs.getString("StudNo"));
+                sf.Course.setText(rs.getString("Course"));
+                sf.Year.setText(rs.getString("Year"));
+                sf.Add.setText(rs.getString("Address"));
+                sf.ContactNo.setText(rs.getString("ContactNo"));
+                sf.Bday.setText(rs.getString("Bday"));
+                sf.Position.setText(rs.getString("Position"));
+                sf.Affiliation.setText(rs.getString("Affiliation"));
+            } else {
+                JOptionPane.showMessageDialog(null, "No matching record found.", "Search", JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+            pstmt.close();
+            conn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
         }
         else if(e.getSource() == btnNewRecord) {
             dispose();
@@ -219,7 +263,6 @@ public class RecordsPage extends JFrame implements ActionListener {
         String query = "UPDATE tblcite SET LName=?, FName=?, MName=?, Course=?, Year=?, Address=?, ContactNo=?, Bday=?, Position=?, Affiliation=? WHERE StudNo=?";
         PreparedStatement ps = conn.prepareStatement(query);
 
-        // Setting the parameters in the correct order
         ps.setString(1, (String) tblRecords.getValueAt(row, 0)); // LName
         ps.setString(2, (String) tblRecords.getValueAt(row, 1)); // FName
         ps.setString(3, (String) tblRecords.getValueAt(row, 2)); // MName
@@ -228,7 +271,6 @@ public class RecordsPage extends JFrame implements ActionListener {
         ps.setString(6, (String) tblRecords.getValueAt(row, 6)); // Address
         ps.setString(7, (String) tblRecords.getValueAt(row, 7)); // ContactNo
 
-        //validation and format for Bday
         String bday = (String) tblRecords.getValueAt(row, 8);
         if (isValidDate(bday)) {
             ps.setString(8, bday); // Bday
