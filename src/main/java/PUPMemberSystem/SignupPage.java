@@ -11,12 +11,13 @@ public class SignupPage extends JFrame implements ActionListener {
     private ImageIcon iipup;
     private JLabel lbltitle, lblDescription, lblLName, lblFName, lblMName, lblStudNo, lblCourse, lblYear, lblAddress, lblContactNo, lblBday, lblPosition, lblAffiliation;
     private JPanel pnlYellow;
-    private JTextField txfLName, txfFName, txfMName, txfStudNo, txfAddress, txfContactNo, txfBday, txfPosition, txfAffiliation;
-    private JComboBox<String> cbCourse, cbYear;
-    private JButton btnSubmit;
+    private JTextField txfLName, txfFName, txfMName, txfStudNo, txfAddress, txfContactNo, txfBday, txfPosition;
+    private JComboBox<String> cbCourse, cbYear, cbAffiliation;
+    private JButton btnSubmit, btnReturn;
     
     private String[] coursechoices = {"", "BSIT", "DICT", "DIT"};
     private String[] yearchoices = {"", "First Year", "Second Year", "Third Year", "Fourth Year"};
+    private String[] affiliationchoices = {"", "IBITS"};
 
     SignupPage() {
         
@@ -123,8 +124,8 @@ public class SignupPage extends JFrame implements ActionListener {
         pnlYellow.add(txfAddress);
         
         //Contact Number
-        lblContactNo = new JLabel("Contact Number");
-        lblContactNo.setBounds(35, 185, 150, 40);
+        lblContactNo = new JLabel("Contact Number (09)");
+        lblContactNo.setBounds(35, 185, 190, 40);
         lblContactNo.setFont(new Font("Aptos", Font.BOLD, 14));
         pnlYellow.add(lblContactNo);
         
@@ -133,8 +134,8 @@ public class SignupPage extends JFrame implements ActionListener {
         pnlYellow.add(txfContactNo);
         
         //Birthday
-        lblBday = new JLabel("Birthday");
-        lblBday.setBounds(265, 185, 150, 40);
+        lblBday = new JLabel("Birthday (YYYY-MM-DD)");
+        lblBday.setBounds(265, 185, 180, 40);
         lblBday.setFont(new Font("Aptos", Font.BOLD, 14));
         pnlYellow.add(lblBday);
         
@@ -158,24 +159,39 @@ public class SignupPage extends JFrame implements ActionListener {
         lblAffiliation.setFont(new Font("Aptos", Font.BOLD, 14));
         pnlYellow.add(lblAffiliation);
         
-        txfAffiliation = new JTextField();
-        txfAffiliation.setBounds(35,285,200,30);
-        pnlYellow.add(txfAffiliation);
+        cbAffiliation = new JComboBox(affiliationchoices);
+        cbAffiliation.setBounds(35,290,200,30);
+        pnlYellow.add(cbAffiliation);
         
         // button to add record and return to records page
         btnSubmit = new JButton("Submit");
-        btnSubmit.setBounds(450, 512, 100, 28);
+        btnSubmit.setBounds(510, 512, 100, 28);
         btnSubmit.setBackground(new Color(119, 7, 55));
         btnSubmit.setForeground(Color.WHITE);
         btnSubmit.addActionListener(this);
         add(btnSubmit);
-
-        setVisible(true);
+        
+        //return btn
+        btnReturn = new JButton("Return");
+        btnReturn.setBounds(380, 512, 100, 28);
+        btnReturn.setBackground(new Color(119, 7, 55));
+        btnReturn.setForeground(Color.WHITE);
+        btnReturn.addActionListener(this);
+        add(btnReturn);
+        
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnSubmit) {
+        if (txfLName.getText().isEmpty() || txfFName.getText().isEmpty() || txfStudNo.getText().isEmpty() || 
+            cbCourse.getSelectedItem() == null || cbYear.getSelectedItem() == null || txfAddress.getText().isEmpty() || 
+            txfContactNo.getText().isEmpty() || txfBday.getText().isEmpty() || txfPosition.getText().isEmpty() || 
+            cbAffiliation.getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(null, "Please fill in all required fields.", "Incomplete Form", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        else {
         try {
         String[] data = new String[11];
         data[0] = txfLName.getText();
@@ -188,7 +204,7 @@ public class SignupPage extends JFrame implements ActionListener {
         data[7] = txfContactNo.getText();
         data[8] = txfBday.getText();
         data[9] = txfPosition.getText();
-        data[10] = txfAffiliation.getText();
+        data[10] = (String)cbAffiliation.getSelectedItem();
         
         Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbcite", "root", "");
         String query = "INSERT INTO tblcite (LName, FName, MName, StudNo, Course, Year, Address, ContactNo, Bday, Position, Affiliation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -203,20 +219,16 @@ public class SignupPage extends JFrame implements ActionListener {
         catch (SQLException a) {
         a.printStackTrace();
         }
-        
-        if (txfLName.getText().isEmpty() || txfFName.getText().isEmpty() || txfStudNo.getText().isEmpty() || 
-            cbCourse.getSelectedItem() == null || cbYear.getSelectedItem() == null || txfAddress.getText().isEmpty() || 
-            txfContactNo.getText().isEmpty() || txfBday.getText().isEmpty() || txfPosition.getText().isEmpty() || 
-            txfAffiliation.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Please fill in all required fields (except Middle Name).", "Incomplete Form", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        else {
             JOptionPane.showMessageDialog(null, "Record Added Successfully!", "Add New Record", JOptionPane.INFORMATION_MESSAGE);
             dispose();
             RecordsPage rp = new RecordsPage();
             rp.setVisible(true);
         }
         }
+        else if (e.getSource() == btnReturn) {
+                dispose();
+                RecordsPage rp = new RecordsPage();
+                rp.setVisible(true);
+            }
     }
 }

@@ -39,9 +39,10 @@ public class RecordsPage extends JFrame implements ActionListener {
         lblTitle.setFont(new Font("Impact", Font.PLAIN, 40));
         
         //table
-        ColumnHeaders = new DefaultTableModel(new Object[]{"Last Name","First Name","Middle Name","Student Number","Course","Year","Address","Contact Number","Birthday","Position","Affiliation"}, 0);
+        ColumnHeaders = new DefaultTableModel(new Object[]{"Last Name","First Name","Middle Name","Student Number","Course","Year","Address","Contact Number","Birthday","Position","Affiliation"}, 0);   
         tblRecords = new JTable(ColumnHeaders);
         tblRecords.setOpaque(false);
+        tblRecords.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
         tableheader = tblRecords.getTableHeader();
         tblRecords.getTableHeader().setBackground(Color.LIGHT_GRAY);
@@ -165,6 +166,10 @@ public class RecordsPage extends JFrame implements ActionListener {
             MainMenu mm = new MainMenu();
             mm.setVisible(true);
         }
+        else if(e.getSource() == btnEnter) {
+            SearchFrame sf = new SearchFrame();
+            sf.setVisible(true);
+        }
         else if(e.getSource() == btnNewRecord) {
             dispose();
             SignupPage sp = new SignupPage();
@@ -182,8 +187,14 @@ public class RecordsPage extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(null, "Please select a row to delete.", "Delete Record", JOptionPane.WARNING_MESSAGE);
             }
         }
-        else if(e.getSource() == btnUpdRecord) {
-            JOptionPane.showMessageDialog(null, "Record/s Updated Successfully!", "Update Record/s", JOptionPane.INFORMATION_MESSAGE);
+        else if (e.getSource() == btnUpdRecord) {
+            int selectedRow = tblRecords.getSelectedRow();
+            if (selectedRow != -1) {
+                updateRecordInDatabase(selectedRow);
+                JOptionPane.showMessageDialog(null, "Record Updated Successfully!", "Update Record", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Please select a row to update.", "Update Record", JOptionPane.WARNING_MESSAGE);
+            }
         }
     }
     
@@ -196,8 +207,56 @@ public class RecordsPage extends JFrame implements ActionListener {
             pstmt.executeUpdate();
             pstmt.close();
             conn.close();
-        } catch (SQLException ex) {
+        } 
+        catch (SQLException ex) {
             ex.printStackTrace();
+        }
+    }
+    
+    private void updateRecordInDatabase(int row) {
+    try {
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbcite", "root", "");
+        String query = "UPDATE tblcite SET LName=?, FName=?, MName=?, Course=?, Year=?, Address=?, ContactNo=?, Bday=?, Position=?, Affiliation=? WHERE StudNo=?";
+        PreparedStatement ps = conn.prepareStatement(query);
+
+        // Setting the parameters in the correct order
+        ps.setString(1, (String) tblRecords.getValueAt(row, 0)); // LName
+        ps.setString(2, (String) tblRecords.getValueAt(row, 1)); // FName
+        ps.setString(3, (String) tblRecords.getValueAt(row, 2)); // MName
+        ps.setString(4, (String) tblRecords.getValueAt(row, 4)); // Course
+        ps.setString(5, (String) tblRecords.getValueAt(row, 5)); // Year
+        ps.setString(6, (String) tblRecords.getValueAt(row, 6)); // Address
+        ps.setString(7, (String) tblRecords.getValueAt(row, 7)); // ContactNo
+
+        //validation and format for Bday
+        String bday = (String) tblRecords.getValueAt(row, 8);
+        if (isValidDate(bday)) {
+            ps.setString(8, bday); // Bday
+        } else {
+            throw new SQLException("Invalid date format for Bday: " + bday);
+        }
+
+        ps.setString(9, (String) tblRecords.getValueAt(row, 9)); // Position
+        ps.setString(10, (String) tblRecords.getValueAt(row, 10)); // Affiliation
+        ps.setString(11, (String) tblRecords.getValueAt(row, 3)); // StudNo 
+
+        ps.executeUpdate();
+        ps.close();
+        conn.close();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+    }
+}
+
+    private boolean isValidDate(String date) {
+        try {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false);
+            sdf.parse(date);
+            return true;
+        } 
+        catch (java.text.ParseException e) {
+            return false;
         }
     }
 }

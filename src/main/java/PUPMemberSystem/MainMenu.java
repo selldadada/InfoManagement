@@ -124,8 +124,11 @@ public class MainMenu extends JFrame implements ActionListener {
         } 
         else if (e.getSource() == btnLogin) {
             String usn = txfadmin.getText();
-            String pw = pwfPw.getText();
-            if(usn.equals("ADMIN") && pw.equals("PASSWORD")) {
+            String pw = new String(pwfPw.getPassword());
+            
+            if(usn.isEmpty() || pw.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Please fill in all fields.", "Missing Information", JOptionPane.WARNING_MESSAGE);
+            } else if(usn.equals("ADMIN") && pw.equals("PASSWORD")) {
                 JOptionPane.showMessageDialog(null, "Login Successful!", "Credentials Correct", JOptionPane.INFORMATION_MESSAGE);
                 lblloading.setVisible(true);
                 pgbloading.setVisible(true);
@@ -134,25 +137,27 @@ public class MainMenu extends JFrame implements ActionListener {
                     @Override
                     protected Void doInBackground() throws Exception {
                         for (int i = 0; i <= 100; i++) {
-                        Thread.sleep(10);
-                        publish(i);
+                            Thread.sleep(10);
+                            publish(i);
+                        }
+                        return null;
                     }
-                    return null;
-                }
 
-                @Override
-                protected void process(java.util.List<Integer> chunks) {
-                    pgbloading.setValue(chunks.get(chunks.size() - 1));
-                }
+                    @Override
+                    protected void process(java.util.List<Integer> chunks) {
+                        pgbloading.setValue(chunks.get(chunks.size() - 1));
+                    }
 
-                @Override
-                protected void done() {
-                    lblloading.setVisible(false);
-                    dispose();
-                    new RecordsPage().setVisible(true);
-                }
+                    @Override
+                    protected void done() {
+                        lblloading.setVisible(false);
+                        dispose();
+                        new RecordsPage().setVisible(true);
+                    }
                 };
                 worker.execute();
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid username or password. Please try again.", "Login Failed", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
