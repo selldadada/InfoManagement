@@ -221,7 +221,9 @@ public class RecordsPage extends JFrame implements ActionListener {
         }
         else if(e.getSource() == btnDelRecord) {
             int selectedRow = tblRecords.getSelectedRow();
-            if (selectedRow != -1) {
+            int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this record?", "Delete Record", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                
                 String studNo = (String) tblRecords.getValueAt(selectedRow, 3);
                 DefaultTableModel model = (DefaultTableModel) tblRecords.getModel();
                 model.removeRow(selectedRow);
