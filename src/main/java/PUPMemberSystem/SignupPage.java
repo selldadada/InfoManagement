@@ -13,7 +13,7 @@ public class SignupPage extends JFrame implements ActionListener {
     private JPanel pnlYellow;
     private JTextField txfLName, txfFName, txfMName, txfStudNo, txfAddress, txfContactNo, txfBday, txfPosition;
     private JComboBox<String> cbCourse, cbYear, cbAffiliation;
-    private JButton btnSubmit, btnReturn;
+    private JButton btnSubmit, btnClear, btnReturn;
     
     private String[] coursechoices = {"", "BSIT", "DICT", "DIT"};
     private String[] yearchoices = {"", "First Year", "Second Year", "Third Year", "Fourth Year"};
@@ -171,9 +171,17 @@ public class SignupPage extends JFrame implements ActionListener {
         btnSubmit.addActionListener(this);
         add(btnSubmit);
         
+        //clear btn
+        btnClear = new JButton("Clear");
+        btnClear.setBounds(380, 512, 100, 28);
+        btnClear.setBackground(new Color(119, 7, 55));
+        btnClear.setForeground(Color.WHITE);
+        btnClear.addActionListener(this);
+        add(btnClear);
+        
         //return btn
         btnReturn = new JButton("Return");
-        btnReturn.setBounds(380, 512, 100, 28);
+        btnReturn.setBounds(10, 525, 100, 28);
         btnReturn.setBackground(new Color(119, 7, 55));
         btnReturn.setForeground(Color.WHITE);
         btnReturn.addActionListener(this);
@@ -224,6 +232,19 @@ public class SignupPage extends JFrame implements ActionListener {
             RecordsPage rp = new RecordsPage();
             rp.setVisible(true);
         }
+        }
+        else if (e.getSource() == btnClear) {
+            txfLName.setText("");
+            txfFName.setText("");
+            txfMName.setText("");
+            txfStudNo.setText("");
+            txfAddress.setText("");
+            txfContactNo.setText("");
+            txfBday.setText("");
+            txfPosition.setText("");
+            cbCourse.setSelectedIndex(0);
+            cbYear.setSelectedIndex(0);
+            cbAffiliation.setSelectedIndex(0);
         }
         else if (e.getSource() == btnReturn) {
                 dispose();
