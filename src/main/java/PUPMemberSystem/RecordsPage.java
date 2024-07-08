@@ -4,8 +4,6 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.sql.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.border.LineBorder;
 import javax.swing.table.*;
 
@@ -93,7 +91,7 @@ public class RecordsPage extends JFrame implements ActionListener {
         add(txfLName);
         txfLName.setBounds(1155,360,170,30);
         
-        lblFName = new JLabel("Course");
+        lblFName = new JLabel("First Name");
         add(lblFName);
         lblFName.setBounds(1155,400,100,30);
         lblFName.setFont(new Font("Arial", Font.BOLD, 13));
@@ -144,9 +142,19 @@ public class RecordsPage extends JFrame implements ActionListener {
             }
             conn.close();
         }
-    catch(Exception e){
+        catch(Exception e){
         System.out.println(e);
-    }
+        }
+        
+        //mouse action For deleting records
+        tblRecords.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int selectedRow = tblRecords.getSelectedRow();
+                if (selectedRow != -1) {
+                }
+            }
+        });
 
     }
 
@@ -163,10 +171,33 @@ public class RecordsPage extends JFrame implements ActionListener {
             sp.setVisible(true);
         }
         else if(e.getSource() == btnDelRecord) {
-            JOptionPane.showMessageDialog(null, "Record Deleted Successfully!", "Delete Record", JOptionPane.INFORMATION_MESSAGE);
+            int selectedRow = tblRecords.getSelectedRow();
+            if (selectedRow != -1) {
+                String studNo = (String) tblRecords.getValueAt(selectedRow, 3);
+                DefaultTableModel model = (DefaultTableModel) tblRecords.getModel();
+                model.removeRow(selectedRow);
+                deleteRecordFromDatabase(studNo);
+                JOptionPane.showMessageDialog(null, "Record Deleted Successfully!", "Delete Record", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Please select a row to delete.", "Delete Record", JOptionPane.WARNING_MESSAGE);
+            }
         }
         else if(e.getSource() == btnUpdRecord) {
             JOptionPane.showMessageDialog(null, "Record/s Updated Successfully!", "Update Record/s", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    private void deleteRecordFromDatabase(String studNo) {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbcite", "root", "");
+            String query = "DELETE FROM tblcite WHERE StudNo=?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, studNo);
+            pstmt.executeUpdate();
+            pstmt.close();
+            conn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
 }

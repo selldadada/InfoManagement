@@ -4,14 +4,19 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.Color;
 import java.awt.Font;
+import java.sql.*;
 
 public class SignupPage extends JFrame implements ActionListener {
     
     private ImageIcon iipup;
     private JLabel lbltitle, lblDescription, lblLName, lblFName, lblMName, lblStudNo, lblCourse, lblYear, lblAddress, lblContactNo, lblBday, lblPosition, lblAffiliation;
     private JPanel pnlYellow;
-    private JTextField txfLName, txfFName, txfMName, txfStudNo, txfCourse, txfYear, txfAddress, txfContactNo, txfBday, txfPosition, txfAffiliation;
+    private JTextField txfLName, txfFName, txfMName, txfStudNo, txfAddress, txfContactNo, txfBday, txfPosition, txfAffiliation;
+    private JComboBox<String> cbCourse, cbYear;
     private JButton btnSubmit;
+    
+    private String[] coursechoices = {"", "BSIT", "DICT", "DIT"};
+    private String[] yearchoices = {"", "First Year", "Second Year", "Third Year", "Fourth Year"};
 
     SignupPage() {
         
@@ -38,7 +43,7 @@ public class SignupPage extends JFrame implements ActionListener {
         pnlYellow = new JPanel();
         pnlYellow.setLayout(null);
         pnlYellow.setBackground(new Color(255, 255, 230));
-        pnlYellow.setBounds(130, 120, 730, 370);
+        pnlYellow.setBounds(115, 120, 760, 370);
         add(pnlYellow);
 
         // Please fill in every field
@@ -68,8 +73,8 @@ public class SignupPage extends JFrame implements ActionListener {
         pnlYellow.add(txfFName);
         
         // Middle Name
-        lblMName = new JLabel("Middle Name");
-        lblMName.setBounds(495, 45, 150, 40);
+        lblMName = new JLabel("Middle Name (Leave blank if none)");
+        lblMName.setBounds(495, 45, 250, 40);
         lblMName.setFont(new Font("Aptos", Font.BOLD, 14));
         pnlYellow.add(lblMName);
         
@@ -93,9 +98,9 @@ public class SignupPage extends JFrame implements ActionListener {
         lblCourse.setFont(new Font("Aptos", Font.BOLD, 14));
         pnlYellow.add(lblCourse);
         
-        txfCourse = new JTextField();
-        txfCourse.setBounds(265,150,90,30);
-        pnlYellow.add(txfCourse);
+        cbCourse = new JComboBox(coursechoices);
+        cbCourse.setBounds(265,150,90,30);
+        pnlYellow.add(cbCourse);
         
         //Year
         lblYear = new JLabel("Year");
@@ -103,9 +108,9 @@ public class SignupPage extends JFrame implements ActionListener {
         lblYear.setFont(new Font("Aptos", Font.BOLD, 14));
         pnlYellow.add(lblYear);
         
-        txfYear = new JTextField();
-        txfYear.setBounds(375,150,90,30);
-        pnlYellow.add(txfYear);
+        cbYear = new JComboBox(yearchoices);
+        cbYear.setBounds(375,150,90,30);
+        pnlYellow.add(cbYear);
         
         //Address
         lblAddress = new JLabel("Address");
@@ -171,9 +176,47 @@ public class SignupPage extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnSubmit) {
+        try {
+        String[] data = new String[11];
+        data[0] = txfLName.getText();
+        data[1] = txfFName.getText();
+        data[2] = txfMName.getText();
+        data[3] = txfStudNo.getText();
+        data[4] = (String)cbCourse.getSelectedItem();
+        data[5] = (String)cbYear.getSelectedItem();
+        data[6] = txfAddress.getText();
+        data[7] = txfContactNo.getText();
+        data[8] = txfBday.getText();
+        data[9] = txfPosition.getText();
+        data[10] = txfAffiliation.getText();
+        
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbcite", "root", "");
+        String query = "INSERT INTO tblcite (LName, FName, MName, StudNo, Course, Year, Address, ContactNo, Bday, Position, Affiliation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement ps = conn.prepareStatement(query);
+        for (int i = 0; i < data.length; i++) {
+            ps.setString(i + 1, data[i]);
+        }
+        ps.executeUpdate();
+        ps.close();
+        conn.close();
+        } 
+        catch (SQLException a) {
+        a.printStackTrace();
+        }
+        
+        if (txfLName.getText().isEmpty() || txfFName.getText().isEmpty() || txfStudNo.getText().isEmpty() || 
+            cbCourse.getSelectedItem() == null || cbYear.getSelectedItem() == null || txfAddress.getText().isEmpty() || 
+            txfContactNo.getText().isEmpty() || txfBday.getText().isEmpty() || txfPosition.getText().isEmpty() || 
+            txfAffiliation.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Please fill in all required fields (except Middle Name).", "Incomplete Form", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        else {
+            JOptionPane.showMessageDialog(null, "Record Added Successfully!", "Add New Record", JOptionPane.INFORMATION_MESSAGE);
             dispose();
             RecordsPage rp = new RecordsPage();
             rp.setVisible(true);
+        }
         }
     }
 }
