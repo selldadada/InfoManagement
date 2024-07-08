@@ -3,14 +3,17 @@ package PUPMemberSystem;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.border.LineBorder;
 import javax.swing.table.*;
 
 public class RecordsPage extends JFrame implements ActionListener {
     
     private ImageIcon iipup;
-    private JLabel lblTitle, lblSearch, lblLName, lblCourse;
-    private JTextField txfLName, txfCourse;
+    private JLabel lblTitle, lblSearch, lblLName, lblFName;
+    private JTextField txfLName, txfFName;
     private JTable tblRecords;
     private JScrollPane spScroll;
     private DefaultTableModel ColumnHeaders;
@@ -90,14 +93,14 @@ public class RecordsPage extends JFrame implements ActionListener {
         add(txfLName);
         txfLName.setBounds(1155,360,170,30);
         
-        lblCourse = new JLabel("Course");
-        add(lblCourse);
-        lblCourse.setBounds(1155,400,100,30);
-        lblCourse.setFont(new Font("Arial", Font.BOLD, 13));
+        lblFName = new JLabel("Course");
+        add(lblFName);
+        lblFName.setBounds(1155,400,100,30);
+        lblFName.setFont(new Font("Arial", Font.BOLD, 13));
         
-        txfCourse = new JTextField("");
-        add(txfCourse);
-        txfCourse.setBounds(1155,430,170,30);
+        txfFName = new JTextField("");
+        add(txfFName);
+        txfFName.setBounds(1155,430,170,30);
         
         btnEnter = new JButton("Enter");
         add(btnEnter);
@@ -113,6 +116,37 @@ public class RecordsPage extends JFrame implements ActionListener {
         btnMenu.setBackground(new Color(119, 7, 55));
         btnMenu.setForeground(Color.WHITE);
         btnMenu.addActionListener(this);
+        
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbcite","root","");
+
+            Statement st = conn.createStatement();
+            String query =  "SELECT * FROM tblcite";
+            ResultSet rs = st.executeQuery(query);
+    
+            while(rs.next()){
+                String LName = rs.getString("LName");
+                String FName = rs.getString("FName");
+                String MName = rs.getString("MName");
+                String StudNo = rs.getString("StudNo");
+                String Course = rs.getString("Course");
+                String Year = rs.getString("Year");
+                String Address = rs.getString("Address");
+                String ContactNo = rs.getString("ContactNo");
+                String Bday = rs.getString("Bday");
+                String Position = rs.getString("Position");
+                String Affiliation = rs.getString("Affiliation");
+        
+                String tblInfo[] = {LName, FName, MName, StudNo, Course, Year, Address, ContactNo, Bday, Position, Affiliation};
+                DefaultTableModel record = (DefaultTableModel)tblRecords.getModel();
+        
+                record.addRow(tblInfo);
+            }
+            conn.close();
+        }
+    catch(Exception e){
+        System.out.println(e);
+    }
 
     }
 
